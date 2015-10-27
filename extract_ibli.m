@@ -1,14 +1,23 @@
 function [ibli maxtab] = extract_ibli(signal)
     samplingrate = 250;
+    filtering_constant = 5;
+    minimum_blink_range = samplingrate/25;
+    plot_range = 52800:53500;
+    figure, hold on, plot(plot_range, signal(plot_range)); title('Original vs filtered');
+    %% ( 1 ) Remove high frequencies
     fresult=fft(signal);
-    fresult(round(length(fresult)*1/samplingrate) +  10000: end - round(length(fresult)*1/samplingrate) - 10000)=0;
+    fresult(round(length(fresult)*1/samplingrate) +  filtering_constant * samplingrate:...
+        end - round(length(fresult)*1/(filtering_constant * samplingrate)) - filtering_constant * samplingrate)=0;
     lowpass_signal=real(ifft(fresult));
+    plot(plot_range, lowpass_signal(plot_range));
+    %% ( 2 ) Set to zero all samples which ampluted is less than standard deviation
     %figure, plot(signal - lowpass_signal)
     %%%%%%%%%%%%%%%%%%%corrected = signal - lowpass_signal;
     corrected = lowpass_signal;
     stand_dev = std(corrected);
     zero_ind = find(corrected < std(corrected));
     corrected(zero_ind) = 0;
+    figure, hold on, plot(plot_range, corrected(plot_range)); title('Samples less than \sigma are removed');
 %         temp(find(isnan(temp) == 1)) = 0;
 %         fresult=fft(temp);
 %         fresult(length(temp)/10 : round(length(fresult))- length(temp)/10)=0;
@@ -16,9 +25,12 @@ function [ibli maxtab] = extract_ibli(signal)
 %         fresult(length(fresult) - length(temp)/100: length(fresult)) = 0;
 %         corrected=real(ifft(fresult));
 %         %[maxtab, mintab] = peakdet(temp, 6* std(corrected));
+    %%  ( 3 )  Detect the beginning and the end of the range of a blink candidate 
+    % (3, a) Find the beginning of each beat
     nzi = find(corrected ~= 0);
     nzi_dif = nzi(2:end) - nzi(1:end-1);
     beat_begins = nzi(find(nzi_dif ~= 1) + 1);
+    % (3, b)  Find widths of blink range candidates
     beat_width = [];
     for i = 1:length(beat_begins)
         beat_width(i) = 0;
@@ -33,14 +45,16 @@ function [ibli maxtab] = extract_ibli(signal)
             end
         end
     end
-    
-    beats_ind = find(beat_width > samplingrate/25);
+    % (3, c) if the width of the blink candidate is small, skip it
+    beats_ind = find(beat_width > minimum_blink_range);
     for i = 1:length(beats_ind)
         [val pos] =  max(signal(beat_begins(beats_ind(i)):beat_begins(beats_ind(i))+beat_width(beats_ind(i))));
         peaks(i) = beat_begins(beats_ind(i)) + pos - 1; 
     end
     
-    %figure, plot(signal), hold on;
+    %% (4) Approximate every blink range with a polynomial function, and check that 
+    % the function is concave 
+    figure, plot(plot_range,signal(plot_range)), hold on;
     sel_peaks = beat_begins;
     sel_peaks = [];
     for i = 1:length(peaks)
@@ -52,7 +66,13 @@ function [ibli maxtab] = extract_ibli(signal)
         [min_val min_pos] = min(Y_);
         if((Y_(1) < max_val && Y_(end) < max_val) ) %&& (max_val - (Y_(1) + Y_(end))/2 > samplingrate/25)
             sel_peaks(length(sel_peaks) + 1) = beat_begins(beats_ind(i)) + m_pos;
-            %plot(X + beat_begins(beats_ind(i)), Y_);
+            blink_range = X + beat_begins(beats_ind(i));
+            if(plot_range(1) < blink_range(1) && blink_range(end) < plot_range(end)) % Just for plotting
+                plot(blink_range, Y_);
+                plot(blink_range(1), Y(1), 'ro', 'MarkerSize', 5);
+                plot(blink_range(end), Y(end), 'ro', 'MarkerSize', 5);
+                plot(blink_range(1) + m_pos, max_val, 'ro', 'MarkerSize', 5);
+            end
         end
     end
     
