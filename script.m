@@ -40,23 +40,24 @@ labels = [1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 32]; %subj
 % end
 %manually remove artifacts
 %replace original signals with manually cleaned up ones
-fp2_fp4_memory(18, 143676) = fp2_fp4_memory(18, 143677);
-fp2_fp4_memory(17, 123400:125600) = 10*rand(125600 - 123400 + 1, 1);
-fp2_fp4_memory(15, 72500:76500) = 50*rand(76500 - 72500 + 1, 1);
-fp2_fp4_memory(15, 119500:121500) = 50*rand(121500 - 119500 + 1, 1);
-fp2_fp4_memory(14, 54600:54900) = 10*rand(54900 - 54600 + 1, 1);
-fp2_fp4_memory(9, 121000:123000) = 50*rand(123000 - 121000 + 1, 1);
-fp2_fp4_memory(9, 138000:139000) = 50*rand(139000 - 138000 + 1, 1);
-fp2_fp4_memory(9, 30200:30800) = 50*rand(30800 - 30200 + 1, 1);
-fp2_fp4_memory(9, 139500:141500) = 50*rand(141500 - 139500 + 1, 1);
-fp2_fp4_memory(2,20500:20700) = 10*rand(20700 - 20500 + 1, 1);
-fp2_fp4_memory(2,20500:20700) = 10*rand(20700 - 20500 + 1, 1);
-fp2_fp4_memory(2,139940) = fp2_fp4_memory(2,139941); %because of NaN
-fp2_fp4_memory(2,140000:150000) = fp2_fp4_memory(2,130000:140000);
-fp2_fp4_memory(1,139445) = fp2_fp4_memory(1,139446); %because of NaN
-fp2_fp4_memory(1,140000:150000) = fp2_fp4_memory(1,130000:140000);
-fp2_fp4_iq(2,77600:79400) = 10*rand(79400 - 77600 + 1, 1);
-fp2_fp4_iq(5,47750:48000) = 10*rand(48000 - 47750 + 1, 1);
+% fp2_fp4_memory(18, 143676) = fp2_fp4_memory(18, 143677);
+% fp2_fp4_memory(17, 123400:125600) = 10*rand(125600 - 123400 + 1, 1);
+% fp2_fp4_memory(15, 72500:76500) = 50*rand(76500 - 72500 + 1, 1);
+% fp2_fp4_memory(15, 119500:121500) = 50*rand(121500 - 119500 + 1, 1);
+% fp2_fp4_memory(14, 54600:54900) = 10*rand(54900 - 54600 + 1, 1);
+% fp2_fp4_memory(9, 121000:123000) = 50*rand(123000 - 121000 + 1, 1);
+% fp2_fp4_memory(9, 138000:139000) = 50*rand(139000 - 138000 + 1, 1);
+% fp2_fp4_memory(9, 30200:30800) = 50*rand(30800 - 30200 + 1, 1);
+% fp2_fp4_memory(9, 139500:141500) = 50*rand(141500 - 139500 + 1, 1);
+% fp2_fp4_memory(2,20500:20700) = 10*rand(20700 - 20500 + 1, 1);
+% fp2_fp4_memory(2,20500:20700) = 10*rand(20700 - 20500 + 1, 1);
+% fp2_fp4_memory(2,139940) = fp2_fp4_memory(2,139941); %because of NaN
+% fp2_fp4_memory(2,140000:150000) = fp2_fp4_memory(2,130000:140000);
+% fp2_fp4_memory(1,139445) = fp2_fp4_memory(1,139446); %because of NaN
+% fp2_fp4_memory(1,140000:150000) = fp2_fp4_memory(1,130000:140000);
+% fp2_fp4_iq(2,77600:79400) = 10*rand(79400 - 77600 + 1, 1);
+% fp2_fp4_iq(5,47750:48000) = 10*rand(48000 - 47750 + 1, 1);
+
 
 
 %good signals
@@ -64,18 +65,58 @@ fp2_fp4_iq(5,47750:48000) = 10*rand(48000 - 47750 + 1, 1);
 good_ind = [2 5 12 13 14 16 17 18]; %add 15 7 8 
 clear rest1 rest2 iq_test memory_test
 %only one eye is analyzed below
-for i = 1:length(good_ind)   
-    %[ibli_right, maxtab_right, mintab_right] = extract_ibli(fp1_fp3_rest1(i,:));
-    [ibli, maxtab] = extract_ibli(fp2_fp4_rest1(good_ind(i),:));
-    rest1{i} = ibli;
-    [ibli, maxtab] = extract_ibli(fp2_fp4_rest2(good_ind(i),:));
-    rest2{i} = ibli;
-    [ibli, maxtab] = extract_ibli(fp2_fp4_iq(good_ind(i),:));
-    iq_test{i} = ibli;
-    [ibli, maxtab] = extract_ibli(fp2_fp4_memory(good_ind(i),:));
-    memory_test{i} = ibli;    
-end
 
+for i = 1:18
+    session_raw_fp1_fp3{1}(i,:) = fp1_fp3_rest1(i,:);
+    session_raw_fp1_fp3{2}(i,:) = fp1_fp3_iq(i,:);
+    session_raw_fp1_fp3{3}(i,:) = fp1_fp3_rest2(i,:);
+    session_raw_fp1_fp3{4}(i,:) = fp1_fp3_memory(i,1:75000);
+    session_raw_fp1_fp3{5}(i,:) = fp1_fp3_memory(i,75001:end);
+    session_raw_fp2_fp4{1}(i,:) = fp2_fp4_rest1(i,:);
+    session_raw_fp2_fp4{2}(i,:) = fp2_fp4_iq(i,:);
+    session_raw_fp2_fp4{3}(i,:) = fp2_fp4_rest2(i,:);
+    session_raw_fp2_fp4{4}(i,:) = fp2_fp4_memory(i,1:75000);
+    session_raw_fp2_fp4{5}(i,:) = fp2_fp4_memory(i,75001:end);    
+end
+    
+for k = 1:5
+    for i = 1:18
+        input = [session_raw_fp1_fp3{k}(i,:); session_raw_fp2_fp4{k}(i,:)];
+        if ~isempty(find(isnan(input(1,:))))
+            input(1, find(isnan(input(1,:)))) = 0;
+        end
+        if ~isempty(find(isnan(input(2,:))))
+            input(2, find(isnan(input(2,:)))) = 0;
+        end        
+        result = applyICA(input);
+        if ~isempty(find(abs(result(:, 1)) > 5))
+            result(find(abs(result(:, 1)) > 5), 1) = 0;
+        end
+        if ~isempty(find(abs(result(:, 2)) > 5))
+            result(find(abs(result(:, 2)) > 5), 2) = 0;
+        end
+        if(sum(abs(result(:, 2)) > 3) < sum(abs(result(:, 1)) > 3))
+            session{k}(i, :) = result(:,1);
+        else
+            session{k}(i, :) = result(:,2);
+        end
+    end
+end
+%figure, plot(session_raw_fp1_fp3{4}(5,:))
+for k = 1:5
+    k
+    for i = 1:18  
+        %[ibli_right, maxtab_right, mintab_right] = extract_ibli(fp1_fp3_rest1(i,:));
+        [ibli, maxtab] = extract_ibli(session{k}(i,:));
+        session_ibi{k}{i} = ibli;
+%         [ibli, maxtab] = extract_ibli(fp2_fp4_rest2(good_ind(i),:));
+%         rest2{i} = ibli;
+%         [ibli, maxtab] = extract_ibli(fp2_fp4_iq(good_ind(i),:));
+%         iq_test{i} = ibli;
+%         [ibli, maxtab] = extract_ibli(fp2_fp4_memory(good_ind(i),:));
+%         memory_test{i} = ibli;    
+    end
+end
 
 
 for i = 1:length(good_ind)
@@ -91,11 +132,10 @@ end
 
 %calcualte number of blinks for each patient during each of four stages
 clear rest1_len rest2_len  iq_test_len memory_test_len 
-for i = 1:length(good_ind);
-    rest1_len(i) = length(rest1{i});
-    rest2_len(i) = length(rest2{i});
-    iq_test_len(i) = length(iq_test{i});
-    memory_test_len(i) = length(memory_test{i});
+for k = 1:5
+    for i = 1:length(good_ind);
+        session_ibi_len(k,i) = length(session_ibi{k}{i});
+    end
 end
 
 %select only those that have more than 100 blinks, others assumed to be
@@ -120,37 +160,45 @@ for i = 1:length(final_ind)
     incorrectly_detected_memory(i) = 600 - sum(memory_test{final_ind(i)});
 end
 
-figure(10), hold on;
-set(gca, 'YTick', []);
-axis([0 max(iq_test_len) + 30 0 130]);
-title('Inter-blink interval dynamics extracted while 1st time resting stage')
 figure(11), hold on;
 set(gca, 'YTick', []);
-axis([0 max(iq_test_len) + 30 0 130]);
-title('Inter-blink interval dynamics extracted while 2nd time resting stage')
+axis([0 max(max(session_ibi_len)) + 30 0 130]);
+title('Inter-blink interval dynamics extracted while 1st time resting stage')
 figure(12), hold on;
 set(gca, 'YTick', []);
-axis([0 max(iq_test_len) + 30 0 130]);
-title('Inter-blink interval dynamics extracted while IQ testing')
+axis([0 max(max(session_ibi_len)) + 30 0 130]);
+title('Inter-blink interval dynamics extracted while 2nd time resting stage')
 figure(13), hold on;
 set(gca, 'YTick', []);
-axis([0 max(iq_test_len) + 30 0 130]);
+axis([0 max(max(session_ibi_len)) + 30 0 130]);
+title('Inter-blink interval dynamics extracted while IQ testing')
+figure(14), hold on;
+set(gca, 'YTick', []);
+axis([0 max(max(session_ibi_len)) + 30 0 130]);
+title('Inter-blink interval dynamics extracted while reading the passage')
+figure(15), hold on;
+set(gca, 'YTick', []);
+axis([0 max(max(session_ibi_len)) + 30 0 130]);
 title('Inter-blink interval dynamics extracted while memory testing')
-plot_step = 10;
-for i = 1:length(final_ind);
-    color = [rand rand rand];
-    figure(10), line([0 max(iq_test_len)],[(i-1)*plot_step (i-1)*plot_step], 'Color', [0.2 0.2 0.2]);
-    figure(10), plot(rest1{final_ind(i)} + (i-1)*plot_step, 'color', color);
-    figure(10), text(- 25, (i-1)*plot_step + 2, num2str(good_ind(i)), 'color', color);
-    figure(11), line([0 max(iq_test_len)],[(i-1)*plot_step (i-1)*plot_step], 'Color', [0.2 0.2 0.2]);
-    figure(11), plot(rest2{final_ind(i)} + (i-1)*plot_step, 'color', color);
-    figure(11), text(- 25, (i-1)*plot_step + 2, num2str(good_ind(i)), 'color', color);
-    figure(12), line([0 max(iq_test_len)],[(i-1)*plot_step (i-1)*plot_step], 'Color', [0.2 0.2 0.2]);
-    figure(12), plot(iq_test{final_ind(i)} + (i-1)*plot_step, 'color', color);
-    figure(12), text(- 25, (i-1)*plot_step + 2, num2str(good_ind(i)), 'color', color);
-    figure(13), line([0 max(iq_test_len)],[(i-1)*plot_step (i-1)*plot_step], 'Color', [0.2 0.2 0.2]);
-    figure(13), plot(memory_test{final_ind(i)} + (i-1)*plot_step, 'color', color);
-    figure(13), text(- 25, (i-1)*plot_step + 2, num2str(good_ind(i)), 'color', color);
+plot_step = 7;
+good_ind = 1:18;
+
+for i = 1:length(good_ind);
+	color = [rand rand rand];
+    for k = 1:5
+        figure(10 + k), line([0 max(max(session_ibi_len))],[(i-1)*plot_step (i-1)*plot_step], 'Color', [0.2 0.2 0.2]);
+        figure(10 + k), plot(session_ibi{k}{good_ind(i)} + (i-1)*plot_step, 'color', color);
+        figure(10 + k), text(- 25, (i-1)*plot_step + 2, num2str(good_ind(i)), 'color', color);
+    %     figure(11), line([0 max(iq_test_len)],[(i-1)*plot_step (i-1)*plot_step], 'Color', [0.2 0.2 0.2]);
+    %     figure(11), plot(rest2{final_ind(i)} + (i-1)*plot_step, 'color', color);
+    %     figure(11), text(- 25, (i-1)*plot_step + 2, num2str(good_ind(i)), 'color', color);
+    %     figure(12), line([0 max(iq_test_len)],[(i-1)*plot_step (i-1)*plot_step], 'Color', [0.2 0.2 0.2]);
+    %     figure(12), plot(iq_test{final_ind(i)} + (i-1)*plot_step, 'color', color);
+    %     figure(12), text(- 25, (i-1)*plot_step + 2, num2str(good_ind(i)), 'color', color);
+    %     figure(13), line([0 max(iq_test_len)],[(i-1)*plot_step (i-1)*plot_step], 'Color', [0.2 0.2 0.2]);
+    %     figure(13), plot(memory_test{final_ind(i)} + (i-1)*plot_step, 'color', color);
+    %     figure(13), text(- 25, (i-1)*plot_step + 2, num2str(good_ind(i)), 'color', color);
+    end
 end
 
 %statistics for number of blinks
@@ -161,12 +209,10 @@ end
 [mean(memory_test_len(final_ind)) std(memory_test_len(final_ind))]
 
 %statistics for IBI
-for i = 1:length(final_ind)
-    rest1_ibi_stat(i,:) = [mean(rest1{final_ind(i)}) std(rest1{final_ind(i)})];
-    rest2_ibi_stat(i,:) = [mean(rest2{final_ind(i)}) std(rest2{final_ind(i)})];
-    rest12_ibi_stat(i,:) = [mean([rest1{final_ind(i)} rest2{final_ind(i)}]) std([rest1{final_ind(i)} rest2{final_ind(i)}])];
-    iq_ibi_stat(i,:) = [mean(iq_test{final_ind(i)}) std(iq_test{final_ind(i)})];
-    memory_ibi_stat(i,:) = [mean(memory_test{final_ind(i)}) std(memory_test{final_ind(i)})];
+for k = 1:5
+    for i = 1:length(good_ind)
+        session_ibi_stat(i,:,k) = [mean(session_ibi{k}{good_ind(i)}) std(session_ibi{k}{good_ind(i)})];
+    end
 end
 % figure, hold on;
 % plot(rest12_ibi_stat(:,1), ones(1,length(final_ind)), 'go');
@@ -175,9 +221,12 @@ end
 
 
 figure, hold on;
-plot(good_ind, rest12_ibi_stat(:,1), 'go');
-plot(good_ind, iq_ibi_stat(:,1),  'bx');
-plot(good_ind, memory_ibi_stat(:,1), 'rd');
+plot(good_ind, session_ibi_stat(:,1,1), 'go');
+plot(good_ind, session_ibi_stat(:,1,2), 'bx');
+plot(good_ind, session_ibi_stat(:,1,3), 'g.');
+plot(good_ind, session_ibi_stat(:,1,4), 'rd');
+plot(good_ind, session_ibi_stat(:,1,5), 'md');
+
 %plot(rest1_ibi_stat(:,1), 'k.');
 % errorbar(rest12_ibi_stat(:,1), sqrt(rest12_ibi_stat(:,2)), 'go');
 % errorbar(iq_ibi_stat(:,1),  sqrt(iq_ibi_stat(:,2)), 'bx');
