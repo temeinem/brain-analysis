@@ -80,20 +80,28 @@ for i = 1:18
 end
     
 for k = 1:5
+    k
     for i = 1:18
-        input = [session_raw_fp1_fp3{k}(i,:); session_raw_fp2_fp4{k}(i,:)];
-        if ~isempty(find(isnan(input(1,:))))
-            input(1, find(isnan(input(1,:)))) = 0;
+        norm_input_signals = [];
+        inputs = [session_raw_fp1_fp3{k}(i,:); session_raw_fp2_fp4{k}(i,:)];
+        if ~isempty(find(isnan(inputs(1,:))))
+            inputs(1, find(isnan(inputs(1,:)))) = 0;
         end
-        if ~isempty(find(isnan(input(2,:))))
-            input(2, find(isnan(input(2,:)))) = 0;
-        end        
-        result = applyICA(input);
-        if ~isempty(find(abs(result(:, 1)) > 5))
-            result(find(abs(result(:, 1)) > 5), 1) = 0;
+        if ~isempty(find(isnan(inputs(2,:))))
+            inputs(2, find(isnan(inputs(2,:)))) = 0;
+        end    
+
+        for j = 1:size(inputs,1)
+            norm_input_signals = [norm_input_signals; normailizeAndFilterEEG(inputs(j,:))];
+        end   
+        
+        [result, W, A] = ica(norm_input_signals', 'skew');
+        %plotArrayOfTS(result', 'ICA');
+        if ~isempty(find(abs(result(:, 1)) > 7))
+            result(find(abs(result(:, 1)) > 7), 1) = 0;
         end
-        if ~isempty(find(abs(result(:, 2)) > 5))
-            result(find(abs(result(:, 2)) > 5), 2) = 0;
+        if ~isempty(find(abs(result(:, 2)) > 7))
+            result(find(abs(result(:, 2)) > 7), 2) = 0;
         end
         if(sum(abs(result(:, 2)) > 3) < sum(abs(result(:, 1)) > 3))
             session{k}(i, :) = result(:,1);
@@ -119,16 +127,16 @@ for k = 1:5
 end
 
 
-for i = 1:length(good_ind)
-    figure(i), hold on;
-    title(['Number: ' num2str(good_ind(i))]);
-    plot(fp2_fp4_iq(good_ind(i),:));
-    %plot(fp1_fp3_iq(good_ind(i),:), 'k');
-    [ibli, maxtab] = extract_ibli(fp2_fp4_iq(good_ind(i),:));
-    plot(maxtab(:,1), maxtab(:,2),'ro', 'markersize', 5);
-    %[ibli, maxtab, mintab] = extract_ibli(fp1_fp3_iq(good_ind(i),:));
-    %plot(maxtab(:,1), maxtab(:,2),'y.');    
-end
+% for i = 1:length(good_ind)
+%     figure(i), hold on;
+%     title(['Number: ' num2str(good_ind(i))]);
+%     plot((1:length(session{2}(4, :)))/250,session{2}(4, :));
+%     %plot(fp1_fp3_iq(good_ind(i),:), 'k');
+%     [ibli, maxtab] = extract_ibli(session{2}(4, :));
+%     plot(maxtab(:,1)/250, maxtab(:,2),'ro', 'markersize', 5);
+%     %[ibli, maxtab, mintab] = extract_ibli(fp1_fp3_iq(good_ind(i),:));
+%     %plot(maxtab(:,1), maxtab(:,2),'y.');    
+% end
 
 %calcualte number of blinks for each patient during each of four stages
 clear rest1_len rest2_len  iq_test_len memory_test_len 
@@ -160,6 +168,7 @@ for i = 1:length(final_ind)
     incorrectly_detected_memory(i) = 600 - sum(memory_test{final_ind(i)});
 end
 
+good_ind = setdiff(1:18, [3, 6, 8, 9, 10]); 
 figure(11), hold on;
 set(gca, 'YTick', []);
 axis([0 max(max(session_ibi_len)) + 30 0 130]);
@@ -181,7 +190,6 @@ set(gca, 'YTick', []);
 axis([0 max(max(session_ibi_len)) + 30 0 130]);
 title('Inter-blink interval dynamics extracted while memory testing')
 plot_step = 7;
-good_ind = 1:18;
 
 for i = 1:length(good_ind);
 	color = [rand rand rand];
@@ -209,6 +217,7 @@ end
 [mean(memory_test_len(final_ind)) std(memory_test_len(final_ind))]
 
 %statistics for IBI
+clear session_ibi_stat
 for k = 1:5
     for i = 1:length(good_ind)
         session_ibi_stat(i,:,k) = [mean(session_ibi{k}{good_ind(i)}) std(session_ibi{k}{good_ind(i)})];
