@@ -1,4 +1,4 @@
-function output = applyICA(inputs)
+function output = applyICA(inputs, method)
     norm_input_signals = [];
 
     for i = 1:size(inputs,1)
@@ -21,6 +21,6 @@ function output = applyICA(inputs)
     % plotArrayOfTS(Xw, 'Decorrelated');
     %plotArrayOfTS(Reconstructed, 'Reconstructed');
 
-    [icasig, W, A] = ica(norm_input_signals', 'kurt');
+    [icasig, W, A] = ica(norm_input_signals', method);
     output = icasig;
 end

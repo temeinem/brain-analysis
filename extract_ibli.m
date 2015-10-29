@@ -1,19 +1,31 @@
+% function wl = waveform_length(waveform)
+%     for i = 1:length(waveform)
+%         waveform()
+%     end
+% end
+
 function [ibli maxtab] = extract_ibli(signal)
     samplingrate = 250;
-    filtering_constant = 5;
+    signal_length = length(signal);
+    filtering_constant = 15;
+    length_threshold = 20;
     minimum_blink_range = samplingrate/25;
-    plot_range = 52800:53500;
-    %figure, hold on, plot(plot_range, signal(plot_range)); title('Original vs filtered');
-    %% ( 1 ) Remove high frequencies
-    fresult=fft(signal);
-    fresult(round(length(fresult)*1/samplingrate) +  filtering_constant * samplingrate:...
-        end - round(length(fresult)*1/(filtering_constant * samplingrate)) - filtering_constant * samplingrate)=0;
-    lowpass_signal=real(ifft(fresult));
-    %plot(plot_range, lowpass_signal(plot_range));
-    %% ( 2 ) Set to zero all samples which amptudes are less than standard deviation
-    %figure, plot(signal - lowpass_signal)
-    %%%%%%%%%%%%%%%%%%%corrected = signal - lowpass_signal;
-    corrected = lowpass_signal;
+     plot_range = 1:length(signal);
+%      figure, hold on, plot(plot_range, signal(plot_range)); title('Original vs filtered');
+%     %% ( 1, a ) Remove high frequencies
+%     fresult=fft(signal);
+%     fresult(round(signal_length/samplingrate) +  filtering_constant * samplingrate:...
+%         end - round(signal_length/(filtering_constant * samplingrate)) - filtering_constant * samplingrate) = 0;
+%     %% ( 1, b ) Remove low frequencies
+%     fresult(1: samplingrate) = 0;
+%     fresult(end - samplingrate + 1: end) = 0;
+%     filtered_signal = real(ifft(fresult));
+%     plot(plot_range, filtered_signal(plot_range));
+%     %% ( 2 ) Set to zero all samples which amptudes are less than standard deviation
+%     %figure, plot(signal - filtered_signal)
+%     %%%%%%%%%%%%%%%%%%%corrected = signal - lowpass_signal;
+    corrected = signal;
+    %corrected = filtered_signal;
     stand_dev = std(corrected);
     zero_ind = find(corrected < std(corrected));
     corrected(zero_ind) = 0;
@@ -58,21 +70,25 @@ function [ibli maxtab] = extract_ibli(signal)
     sel_peaks = beat_begins;
     sel_peaks = [];
     for i = 1:length(peaks)
-        Y = signal(beat_begins(beats_ind(i)):beat_begins(beats_ind(i))+beat_width(beats_ind(i)));
-        X = 1:length(Y);
+        Y = signal(beat_begins(beats_ind(i)) : beat_begins(beats_ind(i)) + beat_width(beats_ind(i)));
+        X = (1:length(Y)) - 1;
         P = polyfit(X,Y,3);
-        Y_ = P(1)*X.*X.*X + P(2)*X.*X + P(3)*X + P(4);
-        [max_val m_pos] = max(Y_);
-        [min_val min_pos] = min(Y_);
-        if((Y_(1) < max_val && Y_(end) < max_val) ) %&& (max_val - (Y_(1) + Y_(end))/2 > samplingrate/25)
-            sel_peaks(length(sel_peaks) + 1) = beat_begins(beats_ind(i)) + m_pos;
+        Y_approx = P(1)*X.*X.*X + P(2)*X.*X + P(3)*X + P(4);
+        [max_val max_pos] = max(Y_approx);
+        [min_val min_pos] = min(Y_approx);
+        
+        if((Y_approx(1) < max_val && Y_approx(end) < max_val) && ...
+               (atan2((max_val - Y_approx(1)),   (max_pos/250)) * 180/pi) > 80 && ...
+               (atan2((max_val - Y_approx(end)), (max_pos - X(end))/250) * 180/pi < 100) &&...
+               sum(sqrt(diff(Y).^2 + 1)) > length_threshold) %&& (max_val - (Y_(1) + Y_(end))/2 > samplingrate/25)
+            sel_peaks(length(sel_peaks) + 1) = beat_begins(beats_ind(i)) + max_pos;
             blink_range = X + beat_begins(beats_ind(i));
-%             if(plot_range(1) < blink_range(1) && blink_range(end) < plot_range(end)) % Just for plotting
-%                 plot(blink_range, Y_);
-%                 plot(blink_range(1), Y(1), 'ro', 'MarkerSize', 5);
-%                 plot(blink_range(end), Y(end), 'ro', 'MarkerSize', 5);
-%                 plot(blink_range(1) + m_pos, max_val, 'ro', 'MarkerSize', 5);
-%             end
+%               if(plot_range(1) < blink_range(1) && blink_range(end) < plot_range(end)) % Just for plotting
+%                   plot(blink_range, Y_approx, 'k:', 'LineWidth', 2);
+%                   plot(blink_range(1), Y_approx(1), 'ro', 'MarkerSize', 5);
+%                   plot(blink_range(end), Y_approx(end), 'ro', 'MarkerSize', 5);
+%                   plot(blink_range(1) + max_pos, max_val, 'ro', 'MarkerSize', 5);
+%               end
         end
     end
     
