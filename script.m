@@ -2,16 +2,16 @@ colors = get(gca,'colororder');close;
 colors = [colors; colors; colors; colors];
 %load up fp1-fp3 and fp2-fp4 EEG for all patients w/o and w/ music
 %subjects 1 ~ 18 are w/o music
-load('./Data/fp1_fp3_iq_all.mat');;
-load('./Data/fp1_fp3_memory_all.mat');
-load('./Data/fp1_fp3_rest1_all.mat')
-load('./Data/fp1_fp3_rest2_all.mat');
-
-load('./Data/fp2_fp4_iq_all.mat');
-load('./Data/fp2_fp4_memory_all.mat');
-load('./Data/fp2_fp4_rest1_all.mat');
-load('./Data/fp2_fp4_rest2_all.mat');
-
+% load('./Data/fp1_fp3_iq_all.mat');;
+% load('./Data/fp1_fp3_memory_all.mat');
+% load('./Data/fp1_fp3_rest1_all.mat')
+% load('./Data/fp1_fp3_rest2_all.mat');
+% 
+% load('./Data/fp2_fp4_iq_all.mat');
+% load('./Data/fp2_fp4_memory_all.mat');
+% load('./Data/fp2_fp4_rest1_all.mat');
+% load('./Data/fp2_fp4_rest2_all.mat');
+load('./Data/eeg28.mat');
 %labels_nomusic = [1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 32]; %subjects IDs
 sampling_rate = 250;
 
@@ -151,7 +151,7 @@ good_ind = setdiff(1:28, [3, 4, 6, 8, 9, 10, 21, 25, 27]);
 %good_ind = 1:28;
 
 %% Detect blinks and form inter-blink intervals
-plot_detected_beats = 0;
+plot_detected_beats = 1;
 for k = 1:5
     k
     for i = 1:length(good_ind)
