@@ -1,3 +1,4 @@
+addpath('./ICA/');
 colors = get(gca,'colororder');close;
 colors = [colors; colors; colors; colors];
 %load up fp1-fp3 and fp2-fp4 EEG for all patients w/o and w/ music
