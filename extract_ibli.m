@@ -31,8 +31,9 @@ function [ibli maxtab] = extract_ibli(signal)
             end
         end
     end
-    % (c) if the width of the blink candidate is small, skip it
-    beats_ind = find(beat_width > minimum_blink_range);
+    % (c) if the width of the blink candidate is too small or longer than 1 second, skip it
+    beats_ind = find(beat_width > minimum_blink_range & beat_width < samplingrate);
+
     for i = 1:length(beats_ind)
         [val pos] =  max(signal(beat_begins(beats_ind(i)):beat_begins(beats_ind(i))+beat_width(beats_ind(i))));
         peaks(i) = beat_begins(beats_ind(i)) + pos - 1; 
