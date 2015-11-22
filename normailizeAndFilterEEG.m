@@ -23,7 +23,7 @@ function filtered_signal = normailizeAndFilterEEG(signal, lpcf, hpcf, samplingra
     cmf_est = cumsum(pmf_est);
     q1 = find((cmf_est < 0.02) ~= 0);
     min_ampl = mn + (mx - mn) * q1(end) / num_bins;
-    q2 = find((cmf_est < 0.995) ~= 0);
+    q2 = find((cmf_est < 0.99) ~= 0);
     max_ampl = mn + (mx - mn) * q2(end) / num_bins;
     filtered_signal(find(min_ampl > filtered_signal)) = min_ampl;
     filtered_signal(find(max_ampl < filtered_signal)) = max_ampl;    

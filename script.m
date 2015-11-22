@@ -148,9 +148,9 @@ for k = 1:5
 end
 % 1,3,9 patients had disconnted electrodes
 %good_ind = setdiff(1:28, [3, 4, 6, 8, 9, 10, 21, 25, 27]); 
-%good_ind = setdiff(19:28, [4, 6, 8, 9, 10]); 
+good_ind = setdiff(1:28, [3, 4, 6, 10]); 
 %good_ind = setdiff(19:28, [4, 6, 8, 9, 10]);
-good_ind = 1:28;
+%good_ind = 1:28;
 
 %% Detect blinks and form inter-blink intervals
 plot_detected_beats = 0;
@@ -186,7 +186,7 @@ markers = {'+','o','*','.','x'};
 figure('Position', [100, 100, 540, 257]), hold on; title('Relationship between number blinks and a task');
 xlabel('Subject number'); ylabel('Number of blinks');
 for k = 1:5
-    plot(1:length(good_ind), session_ibi_len(k, good_ind),'LineStyle',':','Marker',markers{k}, 'LineWidth', 2, 'MarkerSize',5, 'color', colors(k,:));
+    plot(good_ind, session_ibi_len(k, good_ind),'LineStyle',':','Marker',markers{k}, 'LineWidth', 2, 'MarkerSize',5, 'color', colors(k,:));
 end
 legend(gca, 'Resting stage 1','IQ test', 'Resting stage 2', 'Reading passage', 'Memory test', 'Location', 'Best' );
 

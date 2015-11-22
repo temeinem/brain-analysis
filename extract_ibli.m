@@ -15,7 +15,8 @@ function [ibli maxtab] = extract_ibli(signal)
     % (a) Find the beginning of each beat
     nzi = find(signal ~= 0);
     nzi_dif = nzi(2:end) - nzi(1:end-1);
-    beat_begins = nzi(find(nzi_dif ~= 1) + 1);
+    nzi_dif = [0 nzi_dif]; %add non-one value to include first beat
+    beat_begins = nzi(find(nzi_dif ~= 1)); %nzi(find(nzi_dif ~= 1) + 1)
     % (b)  Find widths of blink range candidates
     beat_width = [];
     for i = 1:length(beat_begins)
