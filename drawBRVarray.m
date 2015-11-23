@@ -22,14 +22,14 @@ function drawBRVarray(session_ibi, good_ind, session_ibi_len)
     set(gca, 'YTick', []);
     axis([0 max(max(session_ibi_len(good_ind(:)))) + 30 0 250]);
     title('Inter-blink interval dynamics extracted while memory testing')
-    plot_step = floor(length(good_ind)/ 1.5);
+    plot_step = floor(length(good_ind)/ 2.2);
 
     for i = 1:length(good_ind);
         i
         for k = 1:5
             figure(10 + k), line([0 max(max(session_ibi_len(good_ind(:))))],[(i-1)*plot_step (i-1)*plot_step], 'Color', [0.2 0.2 0.2]);
             figure(10 + k), plot(session_ibi{k}{good_ind(i)} + (i-1)*plot_step, 'color', colors(i,:));
-            figure(10 + k), text(- 20, (i-1)*plot_step + 2, num2str(i), 'color', colors(i,:));
+            figure(10 + k), text(- 20, (i-1)*plot_step + 2, num2str(good_ind(i)), 'color', colors(i,:));
         end
     end
 end

@@ -175,7 +175,7 @@ for k = 1:5
         session_ibi_len(k,i) = length(session_ibi{k}{i});
     end
 end
-session_ibi_len(2,:) = session_ibi_len(2,:) / 2;
+session_ibi_len(2,:) = session_ibi_len(2,:);
 %statistics for number of blinks
 [mean(session_ibi_len); std(session_ibi_len)]
 
@@ -188,7 +188,7 @@ xlabel('Subject number'); ylabel('Number of blinks');
 for k = 1:5
     plot(good_ind, session_ibi_len(k, good_ind),'LineStyle',':','Marker',markers{k}, 'LineWidth', 2, 'MarkerSize',5, 'color', colors(k,:));
 end
-legend(gca, 'Resting stage 1','IQ test', 'Resting stage 2', 'Reading passage', 'Memory test', 'Location', 'Best' );
+legend(gca, 'Resting stage 1','IQ test', 'Resting stage 2', 'Reading passage', 'Memory test' );
 
 % Idea select only those that have more than 50 blinks, others assumed to be corrupted
 % ind1 = find(session_ibi_len(1,:) > 50);
@@ -207,8 +207,8 @@ drawBRVarray(session_ibi, good_ind, session_ibi_len);
 %Calcualte mean and standard deviation for BRV
 clear session_ibi_stat
 for k = 1:5
-    for i = 1:length(good_ind)
-        session_ibi_stat(i,:,k) = [mean(session_ibi{k}{good_ind(i)}) std(session_ibi{k}{good_ind(i)})];
+    for i = 1:size(session_ibi{1},2)
+        session_ibi_stat(i,:,k) = [mean(session_ibi{k}{i}) std(session_ibi{k}{i})];
     end
 end
 
@@ -218,8 +218,8 @@ markers = {'+','o','*','.','x'};
 figure('Position', [100, 100, 540, 257]), hold on; title('Average IBI vs task');
 xlabel('Subject number'); ylabel('Average inter-blink interval');
 for k = 1:5
-        plot(1:length(good_ind), session_ibi_stat(:, 1, k),'LineStyle',':','Marker',markers{k}, 'LineWidth', 2, 'MarkerSize',5, 'color', colors(k,:));
-        %errorbar(1:length(good_ind), session_ibi_stat(:, 1, k),session_ibi_stat(:, 2, k),'LineStyle',':','Marker',markers{k}, 'LineWidth', 2, 'MarkerSize',5);
+        plot(1:length(good_ind), session_ibi_stat(good_ind, 1, k),'LineStyle',':','Marker',markers{k}, 'LineWidth', 2, 'MarkerSize',5, 'color', colors(k,:));
+        %errorbar(1:length(good_ind), session_ibi_stat(good_ind, 1, k),session_ibi_stat(good_ind, 2, k),'LineStyle',':','Marker',markers{k}, 'LineWidth', 2, 'MarkerSize',5);
 end
 legend(gca, 'Resting stage 1','IQ test', 'Resting stage 2', 'Reading passage', 'Memory test', 'Location', 'Best' );
 
