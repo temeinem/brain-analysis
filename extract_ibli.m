@@ -1,13 +1,9 @@
-function [ibli maxtab] = extract_ibli(signal)
-    samplingrate = 250;
-    signal_length = length(signal);
-    filtering_constant = 15;
-    length_threshold = 20;
-    minimum_blink_range = samplingrate/25;
+function [ibli maxtab] = extract_ibli(signal, samplingrate)
+    length_threshold = samplingrate / 50;
+    minimum_blink_range = samplingrate/ 25;
      %plot_range = 125*samplingrate:155*samplingrate;%length(signal);
     plot_range = 1:length(signal);
 %   figure('Position', [100, 100, 540, 257]), hold on, plot(plot_range/250, signal(plot_range)); title('');
-    stand_dev = std(signal);
     zero_ind = find(signal < std(signal));
     signal(zero_ind) = 0;
     %figure('Position', [100, 100, 540, 257]), hold on, plot(plot_range, corrected(plot_range)); title('Samples less than \sigma are removed');
@@ -42,7 +38,7 @@ function [ibli maxtab] = extract_ibli(signal)
     
     %% (2) Approximate every blink range with a polynomial function, and check that 
     % the function is concave 
-    %figure, plot(plot_range,signal(plot_range)), hold on;
+%     figure, plot(plot_range / samplingrate,signal(plot_range)), hold on;
     sel_peaks = beat_begins;
     sel_peaks = [];
     for i = 1:length(peaks)
@@ -54,9 +50,9 @@ function [ibli maxtab] = extract_ibli(signal)
         [min_val min_pos] = min(Y_approx);
         
         if((Y_approx(1) < max_val && Y_approx(end) < max_val) && ...
-               (atan2((max_val - Y_approx(1)),   (max_pos/250)) * 180/pi) > 80 && ...
-               (atan2((max_val - Y_approx(end)), (max_pos - X(end))/250) * 180/pi < 100) &&...
-               sum(sqrt(diff(Y).^2 + 1)) > length_threshold  &&... 
+               (atan2((max_val - Y_approx(1)),   (max_pos/samplingrate)) * 180/pi) > 80 && ...
+               (atan2((max_val - Y_approx(end)), (max_pos - X(end))/samplingrate) * 180/pi < 100) &&...
+               sum(sqrt(diff(Y_approx).^2 + 1/length(Y_approx))) > length_threshold  &&... 
                min_val == min(Y_approx(1), Y_approx(end)))
             sel_peaks(length(sel_peaks) + 1) = beat_begins(beats_ind(i)) + max_pos;
             blink_range = X + beat_begins(beats_ind(i));

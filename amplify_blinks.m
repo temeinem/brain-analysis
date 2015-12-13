@@ -10,7 +10,7 @@ function frontal_component = amplify_blinks(left_eeg, right_eeg, sampling_rate)
         end    
         
         for j = 1:size(inputs,1)
-            norm_input_signals = [norm_input_signals; normailizeAndFilterEEG(inputs(j,:),0.01,0.02,sampling_rate)];
+            norm_input_signals = [norm_input_signals; normailizeAndFilterEEG(inputs(j,:),0.16, 0.24, sampling_rate)];
         end
         
         frontal_component = norm_input_signals(1,:);
