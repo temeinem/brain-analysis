@@ -14,7 +14,7 @@ end
 
 %% Detect blinks and form inter-blink intervals
 good_ind = 1:size(session_raw_fp1{1}, 1);
-good_ind = setdiff(1:size(session_raw_fp1{1}, 1), [4]); % remove bad 
+%good_ind = setdiff(1:size(session_raw_fp1{1}, 1), [4]); % remove bad 
 plot_detected_beats = 0;
 for k = 1:size(session_raw_fp1,2)
     k
